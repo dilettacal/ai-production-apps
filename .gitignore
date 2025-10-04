@@ -269,3 +269,6 @@ logs
 # Temporary files
 *.tmp
 *.temp
+
+# add .env
+.env
