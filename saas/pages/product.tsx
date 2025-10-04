@@ -36,7 +36,9 @@ function ConsultationForm() {
         const controller = new AbortController();
         let buffer = '';
 
-        await fetchEventSource('/api', {
+        // await fetchEventSource('/api', { # Vercel
+        // AWS version
+        await fetchEventSource('/api/consultation', { 
             signal: controller.signal,
             method: 'POST',
             headers: {
