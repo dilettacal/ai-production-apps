@@ -1,4 +1,7 @@
 me.txt
+facts.json
+summary.txt
+linkedin.pdf
 # Exclude all JSON files in memory folders
 memory/*.json
 */memory/*.json
