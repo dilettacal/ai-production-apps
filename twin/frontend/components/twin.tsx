@@ -15,6 +15,7 @@ export default function Twin() {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [sessionId, setSessionId] = useState<string>('');
+    const [apiUrl, setApiUrl] = useState<string>('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -40,7 +41,7 @@ export default function Twin() {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8000/chat', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/chat`, { // https://xxxxxxxx.execute-api.eu-west-1.amazonaws.com/chat
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,7 +52,11 @@ export default function Twin() {
                 }),
             });
 
-            if (!response.ok) throw new Error('Failed to send message');
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`HTTP ${response.status}: ${errorText}`);
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
 
             const data = await response.json();
 
@@ -69,14 +74,22 @@ export default function Twin() {
             setMessages(prev => [...prev, assistantMessage]);
         } catch (error) {
             console.error('Error:', error);
+            
+            // Get more detailed error information
+            let errorMessage = 'Sorry, I encountered an error. Please try again.';
+            if (error instanceof Error) {
+                console.error('Error details:', error.message);
+                errorMessage = `Error: ${error.message}`;
+            }
+            
             // Add error message
-            const errorMessage: Message = {
+            const errorMsg: Message = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: 'Sorry, I encountered an error. Please try again.',
+                content: errorMessage,
                 timestamp: new Date(),
             };
-            setMessages(prev => [...prev, errorMessage]);
+            setMessages(prev => [...prev, errorMsg]);
         } finally {
             setIsLoading(false);
         }
