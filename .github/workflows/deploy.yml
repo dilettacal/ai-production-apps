@@ -1,0 +1,138 @@
+name: Deploy Applications
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - test
+          - prod
+      project:
+        description: 'Project to deploy'
+        required: true
+        default: 'twin'
+        type: choice
+        options:
+          - twin
+          - saas
+          - instant
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # Detect which projects have changes
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      twin-changed: ${{ steps.changes.outputs.twin }}
+      saas-changed: ${{ steps.changes.outputs.saas }}
+      instant-changed: ${{ steps.changes.outputs.instant }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            twin:
+              - 'twin/**'
+            saas:
+              - 'saas/**'
+            instant:
+              - 'instant/**'
+
+  # Deploy Twin if changed or manually selected
+  deploy-twin:
+    needs: detect-changes
+    if: |
+      (github.event_name == 'push' && needs.detect-changes.outputs.twin-changed == 'true') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.project == 'twin')
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions-twin-deploy
+          aws-region: ${{ secrets.DEFAULT_AWS_REGION }}
+
+      - name: Deploy Twin
+        uses: ./.github/actions/twin-deploy
+        with:
+          environment: ${{ github.event.inputs.environment || 'dev' }}
+          aws_role_arn: ${{ secrets.AWS_ROLE_ARN }}
+          aws_region: ${{ secrets.DEFAULT_AWS_REGION }}
+        env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          DEFAULT_AWS_REGION: ${{ secrets.DEFAULT_AWS_REGION }}
+
+  # Deploy SaaS if changed or manually selected
+  deploy-saas:
+    needs: detect-changes
+    if: |
+      (github.event_name == 'push' && needs.detect-changes.outputs.saas-changed == 'true') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.project == 'saas')
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions-saas-deploy
+          aws-region: ${{ secrets.DEFAULT_AWS_REGION }}
+
+      - name: Deploy SaaS
+        run: |
+          echo "🚀 Deploying SaaS to ${{ github.event.inputs.environment || 'dev' }}"
+          # Add your SaaS deployment logic here
+          echo "✅ SaaS deployment would happen here"
+
+  # Deploy Instant if changed or manually selected
+  deploy-instant:
+    needs: detect-changes
+    if: |
+      (github.event_name == 'push' && needs.detect-changes.outputs.instant-changed == 'true') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.project == 'instant')
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions-instant-deploy
+          aws-region: ${{ secrets.DEFAULT_AWS_REGION }}
+
+      - name: Deploy Instant
+        run: |
+          echo "🚀 Deploying Instant to ${{ github.event.inputs.environment || 'dev' }}"
+          # Add your Instant deployment logic here
+          echo "✅ Instant deployment would happen here"
