@@ -5,6 +5,34 @@ from datetime import datetime
 full_name = facts["full_name"]
 name = facts["name"]
 
+# Proficiency level mappings
+PROFICIENCY_LEVELS = {
+    1: "basic knowledge of",
+    2: "experience with",
+    3: "proficient in",
+    4: "highly skilled in",
+    5: "deep expertise in"
+}
+
+def format_tech_item(item):
+    """Convert a tech item with proficiency number to natural language"""
+    name = item.get("name", "")
+    proficiency = item.get("proficiency", 3)
+    level_text = PROFICIENCY_LEVELS.get(proficiency, "experience with")
+    return f"{name} ({level_text})"
+
+def format_tech_stack(tech_stack):
+    """Format the entire tech stack with natural language proficiency levels"""
+    formatted = {}
+    for category, items in tech_stack.items():
+        formatted[category] = [format_tech_item(item) for item in items]
+    return formatted
+
+# Create a formatted version of facts with natural language proficiency
+formatted_facts = facts.copy()
+if "tech_stack" in formatted_facts:
+    formatted_facts["tech_stack"] = format_tech_stack(formatted_facts["tech_stack"])
+
 # Critical rules for the AI Digital Twin
 CRITICAL_RULES = [
     "Do not invent or hallucinate any information that's not in the context or conversation.",
@@ -26,7 +54,7 @@ you are described on the website as the Digital Twin of {name} and you should pr
 ## Important Context
 
 Here is some basic information about {name}:
-{facts}
+{formatted_facts}
 
 Here are summary notes from {name}:
 {summary}
@@ -61,15 +89,7 @@ There are {len(CRITICAL_RULES)} critical rules that you must follow:
 
 ## Skill Proficiency Guidelines
 
-When discussing your technical skills, use proficiency-appropriate language based on the proficiency scale (1-5):
-
-**Proficiency 1 (Beginner):** "I'm familiar with", "I have basic knowledge of", "I'm learning", "I've dabbled in"
-**Proficiency 2 (Basic):** "I have experience with", "I've worked with", "I'm comfortable with", "I can work with"
-**Proficiency 3 (Intermediate):** "I'm proficient in", "I have solid experience with", "I'm skilled in", "I have good knowledge of"
-**Proficiency 4 (Advanced):** "I'm highly skilled in", "I'm an expert in", "I have extensive experience with", "I'm very proficient in"
-**Proficiency 5 (Master):** "I have a proven track record with", "I have several years of experience with", "I'm highly experienced with", "I have deep expertise in"
-
-Use these expressions naturally when discussing your technical background and skills.
+When discussing your technical skills, use the proficiency descriptions provided in your tech stack naturally in conversation. Speak about your skills in first person (e.g., "I have deep expertise in Python" rather than "Python (deep expertise in)"). Integrate these skill descriptions smoothly into your responses without simply listing them.
 
 Please engage with the user.
 
