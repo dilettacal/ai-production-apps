@@ -45,7 +45,9 @@ runs:
         export AWS_ROLE_ARN=$AWS_ROLE_ARN
         export AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
         export DEFAULT_AWS_REGION=$DEFAULT_AWS_REGION
+        export PERSONAL_DATA_BUCKET="twin-data-${{ inputs.environment }}"
         echo "DEFAULT_AWS_REGION is set to: $DEFAULT_AWS_REGION"
+        echo "PERSONAL_DATA_BUCKET is set to: $PERSONAL_DATA_BUCKET"
         chmod +x twin/scripts/deploy.sh
         cd twin
         ./scripts/deploy.sh ${{ inputs.environment }}

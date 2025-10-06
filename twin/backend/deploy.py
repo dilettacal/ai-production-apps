@@ -49,6 +49,30 @@ def main():
     # Copy data directory
     if os.path.exists("data"):
         shutil.copytree("data", "lambda-package/data")
+    
+    # Download personal data from S3 if bucket is specified
+    personal_data_bucket = os.getenv("PERSONAL_DATA_BUCKET")
+    if personal_data_bucket:
+        print(f"Downloading personal data from S3 bucket: {personal_data_bucket}")
+        try:
+            import boto3
+            s3 = boto3.client('s3')
+            
+            # Create data directory in package
+            os.makedirs("lambda-package/data", exist_ok=True)
+            
+            # Download files from S3
+            files_to_download = ["summary.txt", "linkedin.pdf", "facts.json", "style.txt"]
+            for file_name in files_to_download:
+                try:
+                    s3.download_file(personal_data_bucket, file_name, f"lambda-package/data/{file_name}")
+                    print(f"✅ Downloaded {file_name} from S3")
+                except Exception as e:
+                    print(f"⚠️  Warning: Could not download {file_name} from S3: {e}")
+                    
+        except Exception as e:
+            print(f"⚠️  Warning: Could not download from S3: {e}")
+            print("   Using local data files if available...")
 
     # Create zip
     print("Creating zip file...")
