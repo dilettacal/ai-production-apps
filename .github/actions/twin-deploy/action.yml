@@ -42,15 +42,13 @@ runs:
     - name: Run Deployment Script
       shell: bash
       run: |
+        export AWS_ROLE_ARN=$AWS_ROLE_ARN
         export AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID
         export DEFAULT_AWS_REGION=$DEFAULT_AWS_REGION
+        echo "DEFAULT_AWS_REGION is set to: $DEFAULT_AWS_REGION"
         chmod +x twin/scripts/deploy.sh
         cd twin
         ./scripts/deploy.sh ${{ inputs.environment }}
-      env:
-        AWS_ROLE_ARN: ${{ inputs.aws_role_arn }}
-        AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID
-        DEFAULT_AWS_REGION: $DEFAULT_AWS_REGION
 
     - name: Get Deployment URLs
       id: deploy_outputs
