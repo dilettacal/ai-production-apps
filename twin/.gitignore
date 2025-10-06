@@ -2,10 +2,9 @@ me.txt
 facts.json
 summary.txt
 linkedin.pdf
-# Exclude all JSON files in memory folders
-memory/*.json
-*/memory/*.json
-**/memory/*.json
+
+# Memory storage (contains conversation history)
+memory/
 
 # Terraform
 *.tfstate
@@ -13,9 +12,7 @@ memory/*.json
 .terraform/
 .terraform.lock.hcl
 terraform.tfstate.d/
-*.tfvars
-!terraform.tfvars
-!prod.tfvars
+*.tfvars.secret
 
 # Lambda packages
 lambda-deployment.zip
@@ -24,11 +21,13 @@ lambda-package/
 # Environment files
 .env
 .env.*
+!.env.example
 
 # Node
 node_modules/
 out/
 .next/
+*.log
 
 # Python
 __pycache__/
@@ -41,4 +40,7 @@ uv.lock
 .idea/
 *.swp
 .DS_Store
+Thumbs.db
 
+# AWS
+.aws/
