@@ -1,5 +1,40 @@
 # Twin AI Production App
 
+## 🏗️ Infrastructure Overview
+
+This project deploys a serverless AI Digital Twin application on AWS with the following architecture:
+
+### **Core Components:**
+- **🌐 Frontend**: React/Next.js SPA hosted on S3 + CloudFront CDN
+- **🤖 Backend**: FastAPI Lambda function powered by AWS Bedrock AI (Nova models)
+- **🔗 API Gateway**: HTTP API for Lambda integration
+- **💾 Storage**: S3 buckets for conversation memory and personal data
+- **🔒 Security**: IAM roles, ACM SSL certificates, Route53 DNS
+
+### **AWS Resources:**
+- **S3 Buckets**: Frontend hosting, conversation memory, personal data storage
+- **Lambda Function**: Python FastAPI backend with Bedrock integration
+- **API Gateway**: HTTP API with CORS and routing
+- **CloudFront**: Global CDN with custom domain support
+- **Route53**: DNS management for custom domains
+- **ACM**: SSL/TLS certificates (CloudFront requires us-east-1)
+- **IAM**: Roles and policies for secure service access
+
+### **Environments:**
+- **dev**: Development environment with basic configuration
+- **test**: Testing environment for validation
+- **prod**: Production environment with custom domain support
+
+### **Key Features:**
+- ✅ Multi-environment support (dev/test/prod)
+- ✅ Custom domain support with SSL certificates
+- ✅ Secure personal data storage in S3
+- ✅ GitHub Actions CI/CD pipeline
+- ✅ Infrastructure as Code with Terraform
+- ✅ Serverless architecture (pay-per-use)
+
+---
+
 ## Bootstrap Terraform Backend (For Nuclear AWS Cleanup 🚀)
 
 If you ever delete everything on AWS and need to recreate the Terraform backend from scratch:
