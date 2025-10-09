@@ -293,3 +293,6 @@ terraform.rc
 
 # Terraform directories (if you want to exclude entire terraform dir)
 # terraform/
+
+# Cyber week3 folder (keep local only)
+cyber/week3/
